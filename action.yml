@@ -1,0 +1,52 @@
+name: 'actions-vault-aws-secret'
+description: 'Fetch and export AWS temporary credentials for github_actions'
+
+inputs:
+  assume_role_arn:
+    description: 'aws role arn to assume, exported aws credentials has this role permissions'
+    required: true
+  vault_address:
+    description: 'address of vault'
+    required: true
+  vault_aws_secret_backend_role:
+    description: 'aws secret backend role name in vault'
+    required: true
+  role_id:
+    description: 'approle role id in vault'
+    required: true
+  secret_id:
+    description: 'approle secret id in vault'
+    required: true
+
+outputs:
+  aws_access_key_id:
+    description: 'aws access key id'
+    value: ${{ steps.fetch-aws-secret.outputs.aws_access_key_id }}
+  aws_secret_access_key:
+    description: 'aws secret access key'
+    value: ${{ steps.fetch-aws-secret.outputs.aws_secret_access_key }}
+  aws_session_token:
+    description: 'aws session token'
+    value: ${{ steps.fetch-aws-secret.outputs.aws_session_token }}
+  assume_role_arn:
+    description: 'assumed role arn'
+    value: ${{ steps.fetch-aws-secret.outputs.assume_role_arn }}
+  vault_aws_secret_backend_role:
+    description: 'assumed role arn'
+    value: ${{ steps.fetch-aws-secret.outputs.vault_aws_secret_backend_role }}
+
+runs:
+  using: "composite"
+  steps:
+    # Login with approle then export temporary aws sts credential to env vars
+    - name: Fetch and export aws secret for role ${{ inputs.assume_role_arn }}
+      id: fetch-aws-secret
+      run: ${{ github.action_path }}/aws_sts_secret.sh
+      shell: bash
+      env:
+        ASSUME_ROLE_ARN: ${{ inputs.assume_role_arn }}
+        VAULT_ADDR: ${{ inputs.vault_address }}
+        VAULT_AWS_SECRET_BACKEND_ROLE: ${{ inputs.vault_aws_secret_backend_role }}
+        ROLE_ID: ${{ inputs.role_id }}
+        SECRET_ID: ${{ inputs.secret_id }}
+
