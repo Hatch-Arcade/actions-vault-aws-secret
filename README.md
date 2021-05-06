@@ -2,7 +2,7 @@ Usage:
 
         # This will export aws credentials to environment variables
         - name: fetch aws secret
-          uses: Hatch-Arcade/actions-vault-aws-secret@v1
+          uses: Hatch-Arcade/actions-vault-aws-secret@v2
           with:
             vault_address: https://vault.example.com
             vault_aws_secret_backend_role: vault_aws_secret
